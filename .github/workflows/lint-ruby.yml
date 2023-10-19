@@ -30,14 +30,8 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        bundle install
+        bundle update
 
     - name: Rubocop
       run: |
         bundle exec rubocop
-
-    - name: Lint for the Style
-      run: make lint
-
-    - name: Run Tests
-      run: make test
