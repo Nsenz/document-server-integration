@@ -1,5 +1,36 @@
 # Change Log
 
+- onRequestSelectDocument method
+- onRequestSelectSpreadsheet method
+- key in referenceData
+- restore from history
+- python: using a repo with a list of formats
+- ruby: using a repo with a list of formats
+- java: using a repo with a list of formats
+- java: getting history by a separate request
+- java-spring: using a repo with a list of formats
+- java-spring: getting history by a separate request
+
+## 1.7.0
+- nodejs: onRequestSelectDocument method
+- nodejs: onRequestSelectSpreadsheet method
+- nodejs: onRequestOpen
+- nodejs: submitForm
+- nodejs: key in referenceData
+- nodejs: change reference source
+- nodejs: using a repo with a list of formats
+- nodejs: delete file without reloading the page
+- nodejs: getting history by a separate request
+- nodejs: restore from history
+- php: using a repo with a list of formats
+- php: restore from history
+- python: restore from history
+- ruby: restore from history
+- csharp-mvc: getting history by a separate request
+- csharp-mvc: restore from history
+- csharp: getting history by a separate request
+- csharp: restore from history
+
 ## 1.6.0
 - nodejs: setUsers for region protection
 - si skin languages

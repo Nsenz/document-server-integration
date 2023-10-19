@@ -145,13 +145,17 @@
         };
 
         // the user is trying to select document for comparing by clicking the Document from Storage button
-        var onRequestCompareFile = function () {
-            docEditor.setRevisedFile(<%= CompareFileData %>);  // select a document for comparing
+        var onRequestSelectDocument = function (event) {
+            var data = <%= DocumentData %>;
+            data.c = event.data.c;
+            docEditor.setRequestedDocument(data);  // select a document for comparing
         };
 
         // the user is trying to select recipients data by clicking the Mail merge button
-        var onRequestMailMergeRecipients = function (event) {
-            docEditor.setMailMergeRecipients(<%= DataMailMergeRecipients %>);  // insert recipient data for mail merge into the file
+        var onRequestSelectSpreadsheet = function (event) {
+            var data = <%= DataSpreadsheet %>;
+            data.c = event.data.c;
+            docEditor.setRequestedSpreadsheet(data);  // insert recipient data for spreadsheet into the file
         };
 
         var onRequestSaveAs = function (event) {  //  the user is trying to save file by clicking Save Copy as... button
@@ -216,25 +220,54 @@
             'onMakeActionLink': onMakeActionLink,
             'onMetaChange': onMetaChange,
             'onRequestInsertImage': onRequestInsertImage,
-            'onRequestCompareFile': onRequestCompareFile,
-            "onRequestMailMergeRecipients": onRequestMailMergeRecipients,
+            'onRequestSelectDocument': onRequestSelectDocument,
+            "onRequestSelectSpreadsheet": onRequestSelectSpreadsheet,
         };
 
         if (config.editorConfig.user.id) {
-            <% if (!string.IsNullOrEmpty(History) && !string.IsNullOrEmpty(HistoryData))
-            { %>
-                config.events['onRequestHistory'] = function () {  // the user is trying to show the document version history
-                    docEditor.refreshHistory(<%= History %>);  // show the document version history
+
+            config.events['onRequestHistory'] = function (event) {  // the user is trying to show the document version history
+
+                let xhr = new XMLHttpRequest();
+                xhr.open("GET", "webeditor.ashx?type=gethistory&filename=<%= FileName %>");
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send();
+                xhr.onload = function () {
+                    console.log(xhr.responseText);
+                    docEditor.refreshHistory(JSON.parse(xhr.responseText));
+                }
+            };
+            config.events['onRequestHistoryData'] = function (event) {  // the user is trying to click the specific document version in the document version history
+                var ver = event.data;
+
+                let xhr = new XMLHttpRequest();
+                xhr.open("GET", "webeditor.ashx?type=getversiondata&filename=<%= FileName %>&version=" + ver + "&directUrl=" + !!config.document.directUrl);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send();
+                xhr.onload = function () {
+                    console.log(xhr.responseText);
+                    docEditor.setHistoryData(JSON.parse(xhr.responseText));  // send the link to the document for viewing the version history
+                }
+            };
+            config.events['onRequestHistoryClose'] = function () {  // the user is trying to go back to the document from viewing the document version history
+                document.location.reload();
+            };
+            config.events['onRequestRestore'] = function (event) {
+                var fileName = "<%= FileName %>";
+                var version = event.data.version;
+                var data = {
+                    fileName: fileName,
+                    version: version
                 };
-                config.events['onRequestHistoryData'] = function (event) {  // the user is trying to click the specific document version in the document version history
-                    var ver = event.data;
-                    var histData = <%= HistoryData %>;
-                    docEditor.setHistoryData(histData[ver - 1]);  // send the link to the document for viewing the version history
-                };
-                config.events['onRequestHistoryClose'] = function () {  // the user is trying to go back to the document from viewing the document version history
-                    document.location.reload();
-                };
-            <% } %>
+
+                let xhr = new XMLHttpRequest();
+                xhr.open("POST", "webeditor.ashx?type=restore&directUrl=" + !!config.document.directUrl);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(JSON.stringify(data));
+                xhr.onload = function () {
+                    docEditor.refreshHistory(JSON.parse(xhr.responseText));
+                }
+            };
 
             // add mentions for not anonymous users
             <% if (!string.IsNullOrEmpty(UsersForMentions))
