@@ -24,7 +24,6 @@ jobs:
       - name: Generate Changelog
         run: |
           awk '/## [0-9]/{p++} p; /## [0-9]/{if (p > 1) exit}' CHANGELOG.md | awk 'NR>2 {print last} {last=$0}' > RELEASE.md
-      - name: 
       - name: Build Csharp MVC Artifact
         run: |
           cd ${{ github.workspace }}
